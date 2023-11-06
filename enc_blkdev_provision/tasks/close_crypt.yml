@@ -1,0 +1,15 @@
+---
+# tasks file for enc_blkdev_provision
+- debug:
+    msg: Device name = {{ DEVICE_NAME }}
+  tags:
+    - debug
+    - never
+
+- name: Close luks device
+  community.crypto.luks_device:
+    state: "closed"
+    name: "{{ DEVICE_NAME }}"
+
+
+  

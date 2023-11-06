@@ -1,0 +1,117 @@
+---
+- name: Set Variables
+  tags:
+    - always
+  ansible.builtin.set_fact:
+    DEVICE_NAME: "{{ enc_blkdev_provision_device_name }}"
+    STORAGE_SIZE_MB: "{{ enc_blkdev_provision_storage_size_mb }}"
+    STORAGE_PATH: "{{ enc_blkdev_provison_storage_path }}"
+    MOUNTS_LOCATION: "{{ enc_blkdev_provision_mounts_location }}"
+    BLOCK_IMAGE_FILE: "{{ enc_blkdev_provision_device_name }}.img"
+    BLOCK_IMAGE_KEY: "{{ enc_blkdev_provision_device_name }}.key"
+    ROOT_SUBVOL_NAME: "@{{ enc_blkdev_provision_device_name }}-root"
+    SNAPSHOTS_SUBVOL_NAME: "@{{ enc_blkdev_provision_device_name }}-snapshots"
+    MAPPED_DEVICE: "/dev/mapper/{{ enc_blkdev_provision_device_name }}"
+    MOUNT_PATH: "{{ enc_blkdev_provision_mounts_location }}/{{ enc_blkdev_provision_device_name }}"
+    SNAPSHOTS_DIRECTORY: ".snapshots"
+
+ 
+- name: Set Variable Mixins
+  tags:
+    - always
+  ansible.builtin.set_fact:
+    BLOCK_IMAGE_FILE_PATH: "{{ STORAGE_PATH }}/{{ BLOCK_IMAGE_FILE }}"
+    BLOCK_IMAGE_KEY_PATH: "{{ STORAGE_PATH }}/{{ BLOCK_IMAGE_KEY }}"
+    SNAPSHOTS_LOCATION: "{{ MOUNT_PATH }}/{{ SNAPSHOTS_DIRECTORY }}"
+    ROOT_SNAPSHOT_LOCATION: "{{ MOUNT_PATH }}/{{ SNAPSHOTS_DIRECTORY }}/{{ ROOT_SUBVOL_NAME }}"
+
+
+- name: Unmount filesystem
+  tags: ['stop', 'remove', 'never']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: remove_fs_mount
+    apply:
+      tags: ['stop', 'remove']
+
+- name: Stop Encrypted Container
+  tags: ['stop', 'remove', 'never']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: close_crypt
+    apply:
+      tags: ['stop', 'remove']
+
+- name: Close Loop Devices
+  tags: ['stop', 'remove', 'never']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: remove_block_loop_dev
+    apply:
+      tags: ['stop', 'remove']
+
+- name: Remove Encrypted Block Device
+  tags: ['remove', 'never']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: remove_block_image_file
+    apply:
+      tags: ['remove']
+
+
+- name: Initialise Block Device
+  tags: ['init', 'start']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: init_block_image_file
+    apply:
+      tags: ['init', 'start']
+
+- name: Open Block Device Image as Loop Device
+  tags: ['init', 'start']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: create_block_loop_dev
+    apply:
+      tags: ['init', 'start']
+
+- debug:
+    var: LOOP_DEV
+
+- name: Initialise Encryption on Block Device
+  tags: ['init', 'start']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: init_crypt
+    apply:
+      tags: ['init', 'start']
+
+- name: Open encrypted container
+  tags: ['init', 'start']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: open_crypt
+    apply:
+      tags: ['init', 'start']
+
+
+- name: Create BTRFS File System
+  tags: ['init', 'start']
+  ansible.builtin.include_role: 
+    name: enc_blkdev_provision
+    tasks_from: init_btrfs
+    apply:
+      tags: ['init', 'start']
+
+- name: Create snapshot
+  tags: [ 'save', 'init', 'never']
+  ansible.builtin.import_role:
+    name: enc_blkdev_provision
+    tasks_from: create_snapshot
+
+- name: Rollback snapshot
+  tags: [ 'rollback', 'never']
+  ansible.builtin.import_role:
+    name: enc_blkdev_provision
+    tasks_from: rollback_snapshot
+

@@ -1,0 +1,17 @@
+---
+# tasks file for enc_blkdev_provision
+- debug:
+    msg: Block file = {{ BLOCK_IMAGE_FILE_PATH }}, Size = {{ STORAGE_SIZE_MB }}MB, Loop device = {{ LOOP_DEV }}, Key file = {{ BLOCK_IMAGE_KEY_PATH }}
+  tags:
+    - debug
+    - never
+
+- name: Encrypt loop device using keyfile
+  community.crypto.luks_device:
+    device: "{{ LOOP_DEV }}"
+    state: "present"
+    keyfile: "{{ BLOCK_IMAGE_KEY_PATH }}"
+    type: "luks2"
+
+
+  

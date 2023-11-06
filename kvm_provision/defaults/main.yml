@@ -1,0 +1,8 @@
+---
+# defaults file for kvm_provision
+vm_name: example-vm
+mapped_device: /dev/mapper/example-storage
+max_memory_mb: 4096
+memory_mb: 2048
+kernel: /mnt/external-backup/ansible/ipxe-arch.7db2ebf431ea.lkrn
+mac_address: CA:FE:CO:FF:EE:00

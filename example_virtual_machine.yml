@@ -1,0 +1,25 @@
+---
+- name: Deploys VM using arch netboot
+  hosts: localhost
+  gather_facts: yes
+  become: yes
+  vars:
+    kvm_provision_vm_name: example_vm
+    kvm_provision_memory_mb: 2048
+    kvm_provision_max_memory_mb: 4096
+    kvm_provision_mac_address: c0:ff:ee:ca:fe:00
+    kvm_provision_mapped_device: /dev/mapper/example-storage
+    kvm_provision_kernel: /mnt/external-backup/ansible/ipxe-arch.7db2ebf431ea.lkrn
+
+  tasks:
+    - name: KVM Provision role
+      include_role:
+        name: kvm_provision
+      vars:
+        vm_name: "{{ kvm_provision_vm_name }}"
+        memory_mb: "{{ kvm_provision_memory_mb }}"
+        max_memory_mb: "{{ kvm_provision_max_memory_mb }}"
+        mapped_device: "{{ kvm_provision_mapped_device }}"
+        mac_address: "{{ kvm_provision_mac_address }}"
+        kernel: "{{ kvm_provision_kernel }}"
+

@@ -1,0 +1,25 @@
+---
+- name: Unmount FS
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: remove_fs_mount
+    apply:
+      tags: [ 'always' ]
+
+- name: Rollback snapshot
+  community.general.btrfs_subvolume:
+    automount: True
+    filesystem_label: "{{ DEVICE_NAME }}"
+    name: "{{ item.destination }}"
+    snapshot_source: "{{ item.source }}"
+    snapshot_conflict: clobber
+  loop:
+    - source: "{{ SNAPSHOTS_SUBVOL_NAME }}/{{ ROOT_SUBVOL_NAME }}"
+      destination: "{{ ROOT_SUBVOL_NAME }}"
+
+- name: Remount FS
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: init_btrfs
+    apply:
+      tags: ['always']

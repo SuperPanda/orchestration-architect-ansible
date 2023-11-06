@@ -1,0 +1,19 @@
+---
+# tasks file for enc_blkdev_provision
+- debug:
+    msg: Block file = {{ BLOCK_IMAGE_FILE_PATH }}
+  tags:
+    - debug
+    - never
+
+- name: Remove Block Device Image
+  ansible.builtin.command: rm "{{ BLOCK_IMAGE_FILE_PATH }}"
+  args:
+    removes: "{{ BLOCK_IMAGE_FILE_PATH }}"
+
+- name: Remove Block Device Key
+  ansible.builtin.command: rm "{{ BLOCK_IMAGE_KEY_PATH }}"
+  args:
+    removes: "{{ BLOCK_IMAGE_KEY_PATH }}"
+
+  

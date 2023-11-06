@@ -1,0 +1,30 @@
+---
+# snapshots/<date>/root
+# snapshots/root
+#
+#
+- name: Generate time stamp
+  ansible.builtin.shell:  date --iso-8601=ns| sed 's/[,:]/_/g'
+  register: timestamp_cmd
+  changed_when: False
+
+- name: Store timestamp in variable
+  ansible.builtin.set_fact:
+    timestamp: "{{ timestamp_cmd.stdout }}"
+
+- debug:
+    var: timestamp
+ 
+- name: Create snapshot
+  community.general.btrfs_subvolume:
+    automount: True
+    filesystem_label: "{{ DEVICE_NAME }}"
+    name: "{{ item.destination }}"
+    snapshot_source: "{{ item.source }}"
+    snapshot_conflict: clobber
+  loop:
+    - source: "{{ ROOT_SUBVOL_NAME }}"
+      destination: "{{ SNAPSHOTS_SUBVOL_NAME }}/{{ timestamp  }}-{{ ROOT_SUBVOL_NAME }}"
+    - source:  "{{ SNAPSHOTS_SUBVOL_NAME }}/{{ timestamp  }}-{{ ROOT_SUBVOL_NAME }}"
+      destination: "{{ SNAPSHOTS_SUBVOL_NAME }}/{{ ROOT_SUBVOL_NAME }}"
+

@@ -1,0 +1,51 @@
+---
+# tasks file for enc_blkdev_provision
+# https://gitlab.archlinux.org/dvzrv/ansible-install_archlinux/-/blob/main/tasks/format_root_partitions.yml
+#
+- name: Creates a BTRFS filesystem
+  community.general.filesystem:
+    dev: "{{ MAPPED_DEVICE }}"
+    fstype: btrfs
+    state: present
+    opts: -L {{ DEVICE_NAME }}
+
+- name: Mount initial btrfs root
+  ansible.posix.mount:
+    path: "{{ MOUNT_PATH }}"
+    src: "{{ MAPPED_DEVICE }}"
+    state: ephemeral
+    fstype: btrfs
+
+
+- name: Create subvolumes
+  community.general.btrfs_subvolume:
+    name: "{{ item }}"
+    filesystem_label: "{{ DEVICE_NAME }}"
+  loop:
+    - "{{ ROOT_SUBVOL_NAME }}"
+    - "{{ SNAPSHOTS_SUBVOL_NAME }}"
+
+- name: Umount initial btrfs root 
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: remove_fs_mount
+    apply:
+      tags: [ 'always' ]
+
+
+- name: Mount subvolumes
+  ansible.posix.mount:
+    path: "{{ item.mount_path }}"
+    src: "{{ MAPPED_DEVICE }}"
+    state: ephemeral
+    fstype: btrfs
+    opts: compress=lzo,subvol={{ item.subvol_name }}
+  loop:
+    - subvol_name: "{{ ROOT_SUBVOL_NAME }}"
+      mount_path: "{{ MOUNT_PATH }}"
+    - subvol_name: "{{ SNAPSHOTS_SUBVOL_NAME }}"
+      mount_path: "{{ SNAPSHOTS_LOCATION }}"
+
+
+    
+    

@@ -1,0 +1,13 @@
+---
+# tasks file for enc_blkdev_provision
+- name: Create loop device for block image
+  ansible.builtin.command: losetup --find --nooverlap --show "{{ BLOCK_IMAGE_FILE_PATH }}"
+  register: loopdev
+
+- name: Save created loop device to variable
+  ansible.builtin.set_fact:
+    LOOP_DEV: "{{ loopdev.stdout }}"
+
+
+
+  

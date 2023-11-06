@@ -1,0 +1,15 @@
+#playbook.yml
+---
+- name: Create Arch Linux Base Block Device
+  hosts: localhost
+  gather_facts: true
+ 
+  tasks:
+    - ansible.builtin.import_role:
+        name: enc_blkdev_provision
+      vars:
+        enc_blkdev_provision_device_name: arch_linux_base
+        enc_blkdev_provision_mounts_location: /mnt/managed-mounts
+        enc_blkdev_provison_storage_path: /mnt/external-backup/panda-pool
+        enc_blkdev_provision_storage_size_mb: 2048
+ 

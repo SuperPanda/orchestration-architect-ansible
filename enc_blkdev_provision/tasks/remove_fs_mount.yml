@@ -1,0 +1,11 @@
+---
+- name: Remove snapshot mount
+  ansible.posix.mount:
+    path: "{{ SNAPSHOTS_LOCATION }}"
+    state: unmounted
+    opts: --recursive
+- name: Remove mount
+  ansible.posix.mount:
+    path: "{{ MOUNT_PATH }}"
+    state: unmounted
+    opts: --recursive
