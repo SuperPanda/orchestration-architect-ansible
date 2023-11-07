@@ -1,0 +1,85 @@
+---
+# tasks file for arch_linux_provision
+#- name: Run pacstrap
+#  args:
+#    creates: "{{ MOUNT_PATH }}/root"
+#  ansible.builtin.command: pacstrap -K {{ MOUNT_PATH }} base base-devel
+- name: Set facts for arch linux provision
+  ansible.builtin.set_fact:
+    iso_name: "{{ arch_linux_provision_iso_name }}"
+    iso_profile: "{{ arch_linux_provision_iso_profile }}"
+    iso_label: "{{ arch_linux_provision_iso_label }}"
+    iso_install_dir: "{{ arch_linux_provision_iso_install_dir }}"
+    iso_website: http://github.com/SuperPanda
+    project_name: "{{ arch_linux_provision_project_name }}"
+    project_path: "{{ arch_linux_provision_projects_path }}/{{ arch_linux_provision_project_name}}"
+    ssh_keys_path: "{{ arch_linux_provision_keys_location }}"
+    key_type: "{{ arch_linux_provision_key_type }}"
+    packages: "{{ arch_linux_provision_packages }}"
+    profile_name: "{{ arch_linux_provision_profile_name }}"
+    profile_src_path: "{{ arch_linux_provision_src_profile_configs_path }}/{{ arch_linux_provision_src_profile }}"
+
+- name: Set project relative facts
+  ansible.builtin.set_fact:
+    profile_path: "{{ project_path }}/{{ arch_linux_provision_profiles_directory }}/{{ profile_name }}"
+    output_path: "{{ project_path }}/{{ arch_linux_provision_output_directory }}/{{ profile_name }}"
+    work_path: "{{ project_path }}/{{ arch_linux_provision_work_directory }}/{{ profile_name }}"
+
+- name: Remove Directories
+  tags: ['clean', 'never']
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ profile_path }}"
+    - "{{ output_path }}"
+    - "{{ work_path }}"
+
+- name: Create Directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    force: False
+    recurse: True
+  loop:
+    - "{{ project_path }}"
+    - "{{ ssh_keys_path }}"
+    - "{{ profile_path }}"
+    - "{{ output_path }}"
+    - "{{ work_path }}"
+
+- name: Copy archiso build profile {{ profile_src_path }} to {{ profile_path }}
+  ansible.posix.synchronize:
+    src: "{{ profile_src_path }}/."
+    dest: "{{ profile_path }}"
+
+- name: Generate {{ key_type }} key pair in {{ ssh_keys_path }}
+  community.crypto.openssh_keypair:
+    path: "{{ ssh_keys_path }}/id_{{ key_type }}"
+    type: "{{ key_type }}"
+
+- name: Create ssh directories to use on live image
+  ansible.builtin.file:
+    path: "{{ profile_path }}/airootfs/root/.ssh"
+    state: directory
+    force: False
+    recurse: True
+  
+- name: Copy authorized ssh keys
+  ansible.posix.authorized_key:
+    user: root
+    state: present
+    key: "{{ lookup('file', '{{ ssh_keys_path }}/id_{{ key_type }}.pub') }}"
+    path: "{{ profile_path }}/airootfs/root/.ssh/authorized_keys"
+
+- name: Create profiledef.sh
+  ansible.builtin.template:
+    src: ../templates/profiledef.sh.j2
+    dest: "{{ profile_path }}/profiledef.sh"
+
+- name: Build image
+  args:
+    creates: "{{ output_path }}/{{ iso_label }}"
+  ansible.builtin.command: mkarchiso -v -w {{ work_path | quote }} -o {{ output_path | quote }} {{ profile_path  | quote }}
+
+

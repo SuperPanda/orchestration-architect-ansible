@@ -25,30 +25,13 @@
     SNAPSHOTS_LOCATION: "{{ MOUNT_PATH }}/{{ SNAPSHOTS_DIRECTORY }}"
     ROOT_SNAPSHOT_LOCATION: "{{ MOUNT_PATH }}/{{ SNAPSHOTS_DIRECTORY }}/{{ ROOT_SUBVOL_NAME }}"
 
-
-- name: Unmount filesystem
-  tags: ['stop', 'remove', 'never']
+- name: Stop Encrypted Block Device
+  tags: [ 'stop', 'remove', 'never']
   ansible.builtin.include_role:
     name: enc_blkdev_provision
-    tasks_from: remove_fs_mount
+    tasks_from: stop_enc_blkdev
     apply:
-      tags: ['stop', 'remove']
-
-- name: Stop Encrypted Container
-  tags: ['stop', 'remove', 'never']
-  ansible.builtin.include_role:
-    name: enc_blkdev_provision
-    tasks_from: close_crypt
-    apply:
-      tags: ['stop', 'remove']
-
-- name: Close Loop Devices
-  tags: ['stop', 'remove', 'never']
-  ansible.builtin.include_role:
-    name: enc_blkdev_provision
-    tasks_from: remove_block_loop_dev
-    apply:
-      tags: ['stop', 'remove']
+      tags: [ 'stop', 'remove' ]
 
 - name: Remove Encrypted Block Device
   tags: ['remove', 'never']
@@ -115,3 +98,8 @@
     name: enc_blkdev_provision
     tasks_from: rollback_snapshot
 
+- name: Make available by taking storage offline
+  ansible.builtin.import_role:
+    name: enc_blkdev_provision
+    tasks_from: stop_enc_blkdev
+  tags: [ 'start', 'never' ]

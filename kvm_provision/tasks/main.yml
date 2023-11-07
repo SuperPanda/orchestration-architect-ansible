@@ -1,4 +1,13 @@
 ---
+- name: Load Variables
+  ansible.builtin.set_fact:
+    vm_name: "{{ kvm_provision_vm_name }}"
+    max_memory: "{{ kvm_provision_max_memory }}"
+    memory: "{{ kvm_provision_memory }}"
+    num_cpus: "{{ kvm_provision_num_cpus }}"
+    disks: "{{ kvm_provision_disks }}"
+    net_interfaces: "{{ kvm_provision_net_interfaces }}"
+
 # tasks file for kvm_provision
 - name: GET VMs list
   community.libvirt.virt:
@@ -9,7 +18,7 @@
 - name: Define vm
   community.libvirt.virt:
     command: define
-    xml: "{{ lookup('template','arch-netboot-template.xml.j2') }}"
+    xml: "{{ lookup('template','vm.xml.j2') }}"
   when: "vm_name not in existing_vms.list_vms"
 
 - name: Ensure VM is started

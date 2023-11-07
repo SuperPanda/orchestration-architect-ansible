@@ -1,5 +1,23 @@
 ---
 # defaults file for kvm_provision
+kvm_provision_kernel:
+kvm_provision_vm_name: example-vm
+kvm_provision_num_cpus: 2
+kvm_provision_memory: 1024
+kvm_provision_max_memory: 2048
+
+kvm_provision_disks:
+#  - src_file: /dev/mapper/example-storage
+#    target_dev: vda1
+#    boot_order: 1
+kvm_provision_net_interfaces:
+  - type: bridge
+    mac_address: CA:FE:C0:FF:EE:00
+    boot_order: 1
+    device: service-bridge
+
+
+
 vm_name: example-vm
 mapped_device: /dev/mapper/example-storage
 max_memory_mb: 4096
