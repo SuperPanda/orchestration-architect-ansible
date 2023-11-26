@@ -1,0 +1,7 @@
+# TODO: add to Setup in Readme
+orchestator_bootstrap:
+  local_repo_path: /root/repos/ansible
+  storage_config:
+    - pool: infra_dev_mgmt_pool_0
+      pool_volumes: [ 'luks_infra_dev_mgmt_disk_0' ]
+

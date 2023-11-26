@@ -1,0 +1,43 @@
+bridges:
+  lab_bridge:
+    bridge_type: ovs
+    bridge_name: ovs-lab-bridge
+    description: "OpenvSwitch bridge for the lab network"
+
+  ovs_prod_bridge:
+    bridge_type: ovs
+    bridge_name: ovs-prod-bridge
+    description: "OpenvSwitch bridge for the production network"
+
+vlans:
+  vlan_200_lab:
+    vlan_id: 200
+    vlan_name: vlan-200-lab
+    name: lab_network
+    dhcp_range: 192.168.200.100-200
+    description: "VLAN for the lab network"
+
+
+
+networks:
+  lab_network: 
+    name: lab_network
+    site: au-west-1
+    environment: lab
+    vlans:
+      - vlan_200_lab
+    bridges:
+      - ovs_lab_bridge
+    domain: lab.internal
+    fqdn_domain: lab.internal.au-west-1.pandasportal.net
+    
+
+  production_internal_network:
+    name: internal_production_network
+    site: au-west-1
+    environment: production
+    bridges:
+      - ovs_prod_bridge
+    domain: prod.internal
+    fqdn_domain: prod.internal.au-west-1.pandasportal.net
+

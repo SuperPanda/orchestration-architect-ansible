@@ -1,0 +1,23 @@
+---
+# defaults file for arch_linux_provision
+arch_linux_provision_src_profile_configs_path: /usr/share/archiso/configs
+arch_linux_provision_src_profile: baseline
+arch_linux_provision_profile_name: baseline
+
+arch_linux_provision_iso_install_dir: arch
+arch_linux_provision_iso_name: Arch Linux
+arch_linux_provision_iso_profile: baseline
+arch_linux_provision_iso_label: ARCH
+arch_linux_provision_iso_website: https://archlinux.org
+
+arch_linux_provision_projects_path: /tmp/projects
+arch_linux_provision_project_name: archlinux
+arch_linux_provision_work_directory: work
+arch_linux_provision_output_directory: out
+arch_linux_provision_profiles_directory: profiles
+arch_linux_provision_packages:
+  - base
+arch_linux_provision_keys_location: /tmp/projects/keys
+arch_linux_provision_key_type: ed25519
+
+

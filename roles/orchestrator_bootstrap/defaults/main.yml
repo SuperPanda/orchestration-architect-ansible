@@ -1,0 +1,3 @@
+---
+# defaults file for orchestrator_bootstrap
+orchestrator_mount_path: /mnt/orchestrator

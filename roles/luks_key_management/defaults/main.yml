@@ -1,0 +1,7 @@
+---
+# defaults file for luks_key_management
+
+luks_keys_vault_file: "luks_keys.vault.yml"
+luks_key_size: 2048
+#luks_key_algorithm: 
+

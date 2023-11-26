@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2034
+
+iso_name="{{ iso_name | lower | replace(' ','') }}-{{ iso_profile | lower | replace(' ','') }}"
+iso_label="{{ iso_label | upper | trim }}_$(date +%Y%m)"
+iso_publisher="{{ iso_name  }} <{{ iso_website }}>"
+iso_application="{{ iso_name }} {{ iso_profile }}"
+iso_version="$(date +%Y.%m.%d)"
+install_dir="{{ iso_install_dir }}"
+buildmodes=('iso' 'netboot')
+bootmodes=('bios.syslinux.mbr'
+           'bios.syslinux.eltorito'
+	         'uefi-ia32.grub.esp'
+           'uefi-ia32.grub.eltorito'
+           'uefi-x64.systemd-boot.esp'
+           'uefi-x64.systemd-boot.eltorito')
+arch="x86_64"
+pacman_conf="pacman.conf"
+airootfs_image_type="erofs"
+airootfs_image_tool_options=('-zlz4hc,12' -E ztailpacking)
+encryption_key="auto"
+keys_image_type="erofs"
+keys_image_tool_options=('-zlz4hc,12')
+file_permissions=(
+  ["/etc/shadow"]="0:0:400"
+  ["/root"]="0:0:750"
+  ["/root/.ssh"]="0:0:0700"
+  ["/root/.ssh/authorized_keys"]="0:0:0600"
+)

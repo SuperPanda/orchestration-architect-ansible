@@ -1,0 +1,3 @@
+---
+# vars file for common
+ansible_root: /mnt/orchestrator/ansible

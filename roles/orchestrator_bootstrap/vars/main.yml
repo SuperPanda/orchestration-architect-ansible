@@ -1,0 +1,10 @@
+---
+# vars file for orchestrator_bootstrap
+orchestrator_bootstrap_required_pkgs:
+  - python
+  - ansible
+  - git
+  - btrfs-progs
+
+
+

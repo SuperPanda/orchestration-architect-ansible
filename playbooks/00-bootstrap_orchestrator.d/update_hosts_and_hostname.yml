@@ -1,0 +1,35 @@
+---
+- name: Update Hosts File and Set Hostname
+  hosts: localhost
+  gather_facts: true
+  become: true
+  #vars:
+  #    custom_inventory: "{{ ansible_playbook_dir}}/../../inventory/inventory-bootstrap.ini"
+  vars_files:
+    - ../../group_vars/all.yml
+  vars_prompt:
+    - name: "ansible_hostname"
+      prompt: "Enter a hostname for the orchestrator"
+      private: no  # Set to yes if you want to hide the input (e.g., for sensitive data)
+      default: "{{ new_hostname | default('') }}"
+  tasks:
+    - debug:
+        var: ansible_hostname
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ ansible_hostname }}"
+      register: hostname_result
+      become: true
+
+    - name: Set ansible_hostname
+      ansible.builtin.set_fact:
+        ansible_hostname: "{{ ansible_hostname }}"
+      when: hostname_result.changed
+
+    - name: Create /etc/hosts entry from template
+      template:
+        src: ../../templates/hosts.j2
+        dest: /etc/hosts
+      become: true
+      when: hostname_result.changed
+

@@ -1,0 +1,26 @@
+---
+- name: Unmount filesystem
+  tags: ['stop', 'remove', 'never']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: fs_mount_stop
+    apply:
+      tags: ['always']
+
+- name: Stop Encrypted Container
+  tags: ['stop', 'remove', 'never']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: crypt_stop
+    apply:
+      tags: ['always']
+
+- name: Close Loop Devices
+  tags: ['stop', 'remove', 'never']
+  ansible.builtin.include_role:
+    name: enc_blkdev_provision
+    tasks_from: loopdev_stop
+    apply:
+      tags: ['always']
+
+

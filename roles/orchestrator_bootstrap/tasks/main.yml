@@ -1,0 +1,17 @@
+---
+# Orchestrator Bootstrap Tasks
+- name: Update Arch Linux Keyring
+  community.general.pacman: 
+    name: archlinux-keyring
+    update_cache: true
+- name: Upgrade Arch Linux packages
+  community.general.pacman:
+    upgrade: true
+
+- name: Install packages required for bootstrapping orchestration
+  community.general.pacman:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ orchestrator_bootstrap_required_pkgs }}"
+
+    #- name: Identify Btrfs device by partition label

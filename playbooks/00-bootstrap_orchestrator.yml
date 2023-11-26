@@ -1,0 +1,60 @@
+# 00-bootstrap_orchestrator.yml
+---
+- name: Set hosts and hostname
+  #vars:
+  #    custom_inventory: "{{ ansible_playbook_dir }}/../inventory/inventory-bootstrap.ini"
+  import_playbook: 00-bootstrap_orchestrator.d/update_hosts_and_hostname.yml
+
+- name: Bootstrap Orchestrator
+  hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Check if Vault Password Exists
+      ansible.builtin.stat:
+        path: "vault/.vault_pass"
+      register: vault_pass_check
+
+    - name: Run setup_vault.yml if Vault Password doesn't exist
+      include_tasks: "00-bootstrap_orchestrator.d/setup_vault.yml"
+      when: vault_pass_check.stat.exists == False
+
+    - name: Your Orchestrator Bootstrap Tasks
+      include_role:
+        name: orchestrator_bootstrap
+    #- name: Run the set hostname and hosts playbook
+
+        #- name: Install 
+        #  hosts: localhost
+        #  gather_facts: true
+        #  tasks:
+        #    - name: Update Arch Linux Keyring
+        #      community.general.pacman: 
+        #        name: archlinux-keyring
+        #        update_cache: true
+        #    - name: Upgrade Arch Linux packages
+        #      community.general.pacman:
+        #        upgrade: true
+        #    - name: Install tools for configuration
+        #      community.general.pacman:
+        #        state: latest
+        #        name:
+        #          - python
+        #          - ansible
+        #          - archiso
+        #          - git
+        #          - btrfs-progs
+        #    - name: 
+
+        #    - name: Install archiso profiles
+
+      
+        #    - name: Configure packages
+        #    - name: Setup root user and SSH
+        #    - name: 
+        #    - name: Create Image
+        #    - name: Run ISO
+
+
+  
+

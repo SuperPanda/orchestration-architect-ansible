@@ -1,0 +1,6 @@
+---
+# tasks file for common
+- name: Load vars
+  ansible.builtin.include_vars:
+    dir: "{{ ansible_root }}/vars"
+    name: cfg

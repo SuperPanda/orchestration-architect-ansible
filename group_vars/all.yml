@@ -1,0 +1,5 @@
+# group_vars/all.yml
+
+internal_subdomain: internal
+public_domain: pandasportal.net
+private_domain: "{{ internal_subdomain }}.{{ public_domain }}"

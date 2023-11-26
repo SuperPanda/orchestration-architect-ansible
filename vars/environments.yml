@@ -1,0 +1,8 @@
+environments:
+  lab:
+    networks: [ 'lab_network' ]
+    
+  
+  production: 
+    network: ['production_network']
+

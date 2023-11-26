@@ -1,0 +1,37 @@
+# roles/ovs_provision/tasks/main.yml
+# tasks file for network_setup
+---
+- name: Enumerate Bridges
+  set_fact:
+    enumerated_bridges: "{{ bridges|dict2items }}"
+
+- name: Configure OpenvSwitch Bridges
+  command: "ovs-vsctl add-br {{ item.value.bridge_name }}"
+  with_items: "{{ enumerated_bridges }}"
+  when: "item.value.bridge_type == 'ovs'"
+  register: bridge_creation_output
+
+- name: Print Bridge Configuration Output
+  debug:
+    var: bridge_creation_output.stdout_lines
+
+- name: Configure OpenvSwitch Ports
+  command: "ovs-vsctl add-port {{ ovs_ports[item.key].tap_interface }} {{ item.value.bridge_name }}"
+  with_items: "{{ enumerated_bridges }}"
+  when: "item.value.bridge_type == 'ovs'"
+  register: port_creation_output
+
+- name: Print Port Configuration Output
+  debug:
+    var: port_creation_output.stdout_lines
+
+- name: Configure VLANs
+  command: "ovs-vsctl set port {{ ovs_ports[item.key].tap_interface }} trunks={{ item.value.vlans[0].vlan_id }}"
+  with_items: "{{ enumerated_bridges }}"
+  when: "item.value.bridge_type == 'ovs'"
+  register: vlan_configuration_output
+
+- name: Print VLAN Configuration Output
+  debug:
+    var: vlan_configuration_output.stdout_lines
+

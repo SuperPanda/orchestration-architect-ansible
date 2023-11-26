@@ -1,0 +1,5 @@
+# /etc/hosts
+
+127.0.0.1   {{ ansible_hostname }} {{ ansible_hostname }}.{{ internal_subdomain }} {{ ansible_hostname }}.{{ private_domain }}
+::1         localhost ip6-localhost ip6-loopback
+fe80::1%lo0 localhost
