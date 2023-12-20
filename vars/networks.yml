@@ -1,4 +1,10 @@
 bridges:
+  lan_iot_bridge:
+    bridge_type: ovs
+    bridge_name: lan_iot_bridge
+    name: "Home IoT Bridge"
+    description: "Home IoT Bridge (Used for Home Assistant, LXC for VNC on TVs, etc.)"
+
   lab_bridge:
     bridge_type: ovs
     bridge_name: ovs-lab-bridge
@@ -20,6 +26,14 @@ vlans:
 
 
 networks:
+  lan_iot_network:
+    name: "LAN IoT Network"
+    description: "Network for LAN IoT devices" 
+    bridges:
+      - lan_iot_bridge
+
+
+
   lab_network: 
     name: lab_network
     site: au-west-1

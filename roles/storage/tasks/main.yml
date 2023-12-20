@@ -1,0 +1,92 @@
+---
+# role/storage/tasks/main.yml
+# Role: storage
+# File: role/storage/tasks/main.yml
+#
+#
+# Configuration variables: storage, state
+#
+# state: present, mounted, opened, closed, absent
+# The ephemeral is to avoid putting in fstab, and will
+#
+# storage:
+#
+#   name: string, a human friendly description of storage device,
+#         optional (defaults to path)
+#
+#   path: string, path to the storage device (e.g. /dev/sda1,
+#         /dev/mapper/data),
+#         required
+#
+#   uuid: string, used to identify process a unique device,
+#         or for fine grained control (fact check),
+#         (optional, defaults to omit)
+#
+#   btrfs_subvolumes:
+#
+#     - name: string,
+#             human friendly name of sub volume,
+#             optional
+#
+#       description: string, human friendly descriptions
+#                    of subvolume,
+#                    optional
+#
+#       path: string
+#             the path from the file system root to subvol root
+#             required
+#
+#       subvol: string
+#               the name of the subvolume
+#
+#       subvolid: number, the id of the subvolume
+#
+#       mounts:
+#
+#         - name: string,
+#                 human friendly name of the mount point,
+#                 optional
+#
+#            description: string
+#                         a human friendly name of a mount
+#                         optional
+#
+#            target: string
+#                    the target of the mount
+#
+#            source: string
+#                    the source device
+#
+#            mount_options: string
+#
+
+# Make a show details section with this
+#   ansible_facts['device_links']
+#   ansible_facts['mounts']
+#    var: storage
+
+- name: Display storage parameters
+  ansible.builtin.debug:
+    var: storage
+
+- name: Validate storage configuration
+  ansible.builtin.fail:
+    msg: >
+      Incomplete storage configuration. All required properties
+      within 'storage' must be defined.
+  when:
+    - storage.name is not defined
+    - storage.path is not defined
+    - state is not defined
+
+# present, started, stopped, absent
+- name: "Ensure storage is '{{ state }}'"
+  ansible.builtin.include_tasks:
+    file: "{{ state }}.yml"
+#  vars:
+#    storage: "{{ storage }}"
+#   luks_keyfile: "{{ luks_keyfile }}"
+#   luks_device_name: "{{ luks_device_name }}"
+#   luks_uuid: "{{ luks_uuid }}"
+# - name: Ensure storage is "{{ state }}"
+#   include_task: "{{ state }}".yml

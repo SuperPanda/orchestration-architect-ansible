@@ -1,0 +1,52 @@
+- name: Setup Ansible User and SSH Key
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Set ansible_user variable
+      set_fact:
+        ansible_user: "{{ ansible_user | default('ansible') }}"
+
+    - name: Set ansible_public_key_path variable
+      set_fact:
+        ansible_public_key_path: "{{ ansible_public_key_path | default('ansible_deploy_key.pub') }}"
+
+    - name: Set ansible_ssh_port variable
+      set_fact:
+        ansible_ssh_port: "{{ ansible_ssh_port | default(22) }}"
+
+    # Continue with the rest of the tasks...
+    - name: Create Ansible User
+      user:
+        name: "{{ ansible_user }}"
+        shell: /bin/bash
+        generate_ssh_key: true
+        createhome: yes
+      become_user: root
+
+    - name: Copy Ansible Public Key
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ lookup('file', ansible_public_key_path) }}"
+        state: present
+        # TODO: put the from= key option using gather_facts
+        key_options: ""
+      vars:
+        ansible_public_key_path: "{{ ansible_public_key_path }}"
+
+    - name: Add Ansible User to sudoers
+      lineinfile:
+        dest: /etc/sudoers
+        line: "{{ ansible_user }} ALL=(ALL:ALL) NOPASSWD:ALL"
+        validate: 'visudo -cf %s'
+
+    - name: Add SSH port to ssh_config so ansible can connect to itself
+      community.general.ssh_config:
+        user: "{{ ansible_user }}"
+        host: "{{ ansible_hostname }}"
+        port: "{{ ansible_ssh_port | default(22) }}"
+        identity_file: "/home/{{ ansible_user }}/.ssh/id_rsa"
+        state: present
+

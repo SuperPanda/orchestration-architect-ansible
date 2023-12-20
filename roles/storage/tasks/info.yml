@@ -1,0 +1,46 @@
+---
+# roles/storage/tasks/info.yml
+
+# This task acts as an identity morphism in the category of file paths.
+- name: Check if storage path exists
+  ansible.builtin.stat:
+    path: "{{ storage.path }}"
+  register: storage_path_check
+
+# This debug message represents the identity morphism's output.
+- name: Display storage path status
+  ansible.builtin.debug:
+    msg: >
+      Storage path {{ storage.path }}
+      exists: {{ storage_path_check.stat.exists }}
+  when: storage_path_check.stat.exists is defined
+
+# This inclusion acts as a functor application if the LUKS morphism is present.
+- name: Get information from the LUKS roles
+  ansible.builtin.include_role:
+    name: luks
+  vars:
+    luks_path: "{{ storage.path }}"
+    luks_name: "{{ storage.name }}"
+    luks: "{{ storage.luks }}"
+    state: 'info'
+    # noqa: var-naming[no-role-prefix]
+  when: storage.luks is defined
+
+# Include the BTRFS subvolumes role for
+#  information gathering of BTRFS subvolumes
+#  if btrfs_subvolumes are defined
+#  in the storage supplied storage object
+- name: Get information from the BTRFS subvolumes roles
+  ansible.builtin.include_role:
+    name: btrfs_subvolumes
+  vars:
+    btrfs_volume_path: >-
+      {{ (storage.luks is defined) |
+      ternary('/dev/mapper/' +
+      storage.luks.device_name,
+      storage.path) }}
+    btrfs_subvolumes: "{{ storage.btrfs_subvolumes }}"
+    state: 'info'
+    # noqa: var-naming[no-role-prefix]
+  when: storage.btrfs_subvolumes is defined

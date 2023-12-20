@@ -1,0 +1,14 @@
+---
+# Task file for network
+- debug:
+    var: network
+- name: Network bridge configuration
+  ansible.builtin.include_role:
+    name: network_bridge
+  vars:
+    bridge: "{{ cfg.bridges[bridge_id] }}"
+  with_items: "{{ network.bridges }}"
+  loop_control:
+    loop_var: bridge_id
+
+  

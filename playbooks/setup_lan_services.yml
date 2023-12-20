@@ -1,0 +1,21 @@
+# playbooks/setup_lan_services.yml
+
+- name: Setup LAN Services on PandaBox1
+  hosts: PandaBox1
+  gather_facts: true
+  become_user: ansible
+
+  roles:
+    - role: common
+      ansible_root: "{{ playbook_dir | dirname }}"
+
+    - role: network
+      network: "{{ cfg.networks.lan_iot_network }}"
+
+  tasks:
+    - debug:
+        var: ansible_root
+    - debug:
+        var: cfg.networks['lan_iot_network']
+
+

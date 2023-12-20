@@ -1,0 +1,21 @@
+---
+# roles/btrfs_subvolumes/tasks/main.yml
+
+- name: Assert 'btrfs_volume_path' is provided
+  ansible.builtin.assert:
+    that: btrfs_volume_path is defined
+    fail_msg: >-
+      'btrfs_volume_path' is a required variable and has not been provided.
+
+- name: Pass btrfs_object
+  ansible.builtin.set_fact:
+    btrfs_object:
+      volume_path: "{{ btrfs_volume_path }}"
+      subvolumes: "{{ btrfs_subvolumes | default([]) }}"
+
+- name: Route BTRFS Subvolume Role to the appropriate task file based on state
+  ansible.builtin.include_tasks:
+    file: "{{ state }}.yml"
+  vars:
+    btrfs_volume_path: "{{ btrfs_object.volume_path }}"
+    btrfs_subvolumes: "{{ btrfs_object.subvolumes }}"

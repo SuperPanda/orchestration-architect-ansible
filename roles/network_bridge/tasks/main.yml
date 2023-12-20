@@ -1,0 +1,13 @@
+---
+# tasks file for network_bridge
+
+- name: Configuring Bridge {{ bridge.name }} ({{ bridge.bridge_name }})
+  openvswitch.openvswitch.openvswitch_bridge:
+    bridge: "{{ bridge.bridge_name }}"
+    state: present
+  when: bridge.bridge_type is defined and bridge.bridge_type == 'ovs'
+  become: true
+  become_user: root
+- debug:
+    var: bridge
+

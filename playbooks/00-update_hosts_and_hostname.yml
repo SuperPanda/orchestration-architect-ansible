@@ -1,0 +1,29 @@
+---
+- name: Update Hosts File and Set Hostname
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: true
+  vars_files:
+    - ../group_vars/all.yml
+  tasks:
+    - debug:
+        var: ansible_hostname
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ ansible_hostname }}"
+      register: hostname_result
+      become: true
+
+    - name: Set ansible_hostname
+      ansible.builtin.set_fact:
+        ansible_hostname: "{{ ansible_hostname }}"
+      when: hostname_result.changed
+
+    - name: Create /etc/hosts entry from template
+      template:
+        src: ../templates/hosts.j2
+        dest: /etc/hosts
+      become: true
+      when: hostname_result.changed
+

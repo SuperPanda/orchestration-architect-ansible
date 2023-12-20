@@ -1,0 +1,47 @@
+---
+# Role: Luks Device Management
+# File: roles/luks/tasks/main.yml
+#
+# File: main.yml
+# Description: Manages LUKS encrypted volumes for secure data storage.
+# Usage: Refer to the README.md for detailed usage instructions.
+
+# States: unlocked, locked, present, info
+# Configuration variables: luks_name, luks_path, luks_keyfile, luks_uuid, luks_device_name
+# Alternatively, configurations can be
+#  provided via the luks object:
+#  ({ luks: { name: ..., keyfile: ..., ... }})
+
+- name: Fail fast if missing required parameters for the luks role
+  ansible.builtin.assert:
+    that:
+      - >
+        luks_name is defined
+        or (luks is defined and luks.name is defined)
+      - >
+        luks_path is defined
+        or (luks is defined and luks.path is defined)
+    fail_msg: >
+      LUKS role requires either 'luks_name' / 'luks.name'
+      and either 'luks_path' / 'luks.path'  to call the
+      luks role.
+    success_msg: >
+      All required parameters for the luks role are present.
+
+
+- name: Set luks object
+  ansible.builtin.set_fact:
+    luks_object:
+      name: "{{ luks_name | default((luks | default({})).name | default(omit)) }}"
+      path: "{{ luks_path | default((luks | default({})).path | default(omit)) }}"
+      keyfile: "{{ luks_keyfile | default((luks | default({})).keyfile | default(omit)) }}"
+      device_name: "{{ luks_device_name | default((luks | default({})).device_name | default(omit)) }}"
+      uuid: "{{ luks_uuid | default((luks | default({})).uuid | default(omit)) }}"
+
+# Route task to "{{ state }}".yml
+# Options are [present], started, stopped, absent, [info]
+- name: Set configuration variables
+  ansible.builtin.include_tasks:
+    file: "{{ state }}.yml"
+  vars:
+    luks: "{{ luks_object }}"

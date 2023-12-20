@@ -1,6 +1,6 @@
 #!/usr/bin/zsh
+cd ~/repos/ansible
 ZSHRC="$HOME/.zshrc"
-
 ZSHRC_CHUNK="
 # ANSIBLE_DEV
 alias dev-ansible='zsh /home/panda/repos/ansible/setup-tmux.zsh'

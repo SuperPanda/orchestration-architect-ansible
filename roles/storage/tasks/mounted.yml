@@ -1,0 +1,17 @@
+---
+# role/storage/tasks/mounted.yml
+# Role: storage
+# Task: provide the tasks needed for mounted storage
+# Description: execute tasks to achieve mounted state
+# Configuration variables: storage, state
+
+- name: Ensure storage is present
+  # present, mounted, unmounted 
+  include_task: present.yml  
+  vars:
+      storage: "{{ storage }}"
+
+# Create btrfs subvolumes
+# TODO: NEED TO SEPARATE BTRFS, to BTRFS Subvolume roles.
+- name:
+

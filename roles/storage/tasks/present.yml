@@ -1,0 +1,45 @@
+---
+# roles/storage/tasks/present.yml
+# Role: storage
+# Task: provide the tasks needed for storage to be present
+# Description: ensures that all components are configured
+#              to achieve present state
+# Configuration variables: storage
+# Subcomponents: luks, btrfs_subvolumes, mount
+# States: present, started, stopped, absent
+- name: Display storage object
+  ansible.builtin.debug:
+    var: storage
+
+- name: Validate storage object exists
+  ansible.builtin.fail:
+    msg: >
+      Incomplete storage configuration. All required properties
+      within 'storage' must be defined.
+  when:
+    - storage is not defined
+
+# Ensure LUKS Container exists if enabled
+- name: Ensure presence of LUKS when storage.luks is defined
+  ansible.builtin.include_role:
+    name: luks
+  vars:
+    # noqa: var-naming[no-role-prefix]
+    luks_name: "{{ storage.name }}"
+    luks_path: "{{ storage.path }}"
+    luks: "{{ storage.luks }}"
+    state: present
+  when: storage.luks is defined
+# Add configure filesystem later.
+
+# Now do btrfs_subvolumes
+# Ensure btrfs subvolumes are present if storage.btrfs_subvolumes is defined
+
+# - name: Ensure btrfs subvolumes are present
+# present, mounted, unmounted
+# ansible.builtin.include_role:
+#  name: btrfs_subvolumes
+#  vars:
+#    storage: "{{ storage }}"
+#    state: present
+# when: storage.btrfs_subvolumes is defined

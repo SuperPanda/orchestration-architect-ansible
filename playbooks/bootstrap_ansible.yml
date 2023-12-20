@@ -1,0 +1,16 @@
+
+- name: Run roles
+  hosts: localhost
+  connection: local
+  roles:
+    - role: common
+      ansible_root: "{{ playbook_dir | dirname }}"
+
+#- name: Update Hosts and Hostname
+#  ansible.builtin.import_playbook: 00-update_hosts_and_hostname.yml
+ 
+- name: Prepare Installation Targets
+  ansible.builtin.import_playbook: 00-prepare_installation_target.yml
+ 
+#- name: Setup Ansible User
+#  ansible.builtin.import_playbook: 00-setup_ansible_user.yml

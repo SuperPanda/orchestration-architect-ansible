@@ -1,7 +1,34 @@
-# TODO: add to Setup in Readme
-orchestator_bootstrap:
-  local_repo_path: /root/repos/ansible
-  storage_config:
-    - pool: infra_dev_mgmt_pool_0
-      pool_volumes: [ 'luks_infra_dev_mgmt_disk_0' ]
+---
+# TODO: Encrypt secrets
+orchestrator_bootstrap:
+
+  # References vars/storage.yml to get object use "{{ cfg.volumes['volume_alias'] }}"
+  # Used to choose which volume the system should migrate toov
+  target_storage_alias: luks_install_target_disk_0 
+  source:
+    # Configuration variables are documented here: roles/storage/tasks/main.yml
+    storage:
+      name: 
+      path: "/dev/disk/by-label/external-backup"
+    luks_keyfile: "/root/keyfiles/external-backup.key"
+    # The current name used by device mapper for aliasing the luks block device
+    luks_device_name: "external-device"
+    # The unique identifer for the closed 
+    luks_uuid: "blah"
+    btrfs_subvolumes:
+      device: "/dev/mapper/external-backup"
+      subvolumes:
+        - subvolid: 5 
+          mount_path: /mnt/external
+          #mount_options: rw,noatime,compress=lzo
+
+
+
+    
+
+
+  #local_repo_path: /root/repos/ansible
+  #storage_config:
+  #  - pool: infra_mgmt_pool_0
+  #    pool_volumes: [ 'luks_infra_mgmt_disk_0' ]
 

@@ -1,0 +1,44 @@
+---
+luks_keyfiles:
+  luks_slot10_infra_mgmt_keyfile:
+    name: Infrastructure Management LUKS Key
+    description: >
+      LUKS keys used to unlock disks used
+      for infrastructure management
+    keyslot: 10
+
+storage:
+  pools:
+    infra_mgmt_pool_0:
+      name: Infrastructure Development and Management Pool
+      description: >
+        Pool for infrastructure development,
+        management and deployment
+      volume_aliases:
+        - infra_mgmt_disk_0
+
+  volumes:
+    luks_install_target_disk_0:
+      name: "Existing disk for installation target"
+      path: /dev/disk/by-label/external-backup
+      luks:
+        # points to the luks_keyfile
+        # adefined above luks_keyfiles['infra_mgmt_luks_keyfile']
+        luks_keyfile_alias: luks_slot10_infra_mgmt_keyfile
+        luks_device_name: infra_mgmt_10
+      btrfs_subvolumes:
+        - subvol: "@orchestrator"
+          path: orchestrator
+          # mount_options: <
+          #       defaults,noatime,compress=zstd,
+          #       space_cache,subvol=@orchestrator
+        - subvol: "@orchestrator_ansible"
+          path: orchestrator/ansible
+          # mount_options: <
+          #       defaults,noatime,compress=zstd,
+          #       space_cache,subvol=@orchestrator_ansible
+        - subvol: "@orchestrator_system_builds"
+          path: orchestrator/system-builds
+          # turn off copy on write for each type of storage_pool
+        - subvol: "@orchestrator_storage_pools"
+          path: orchestrator/storage-pools

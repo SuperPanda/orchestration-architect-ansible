@@ -1,0 +1,33 @@
+- name: Configure Installation Target Options
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  roles:
+    - role: common
+      ansible_root: "{{ playbook_dir | dirname }}"
+    - role: storage
+      state: mounted
+      storage: "{{ cfg.orchestrator_bootstrap.storage }}"
+      ansible.builtin.set_fact:
+        storage: "{{ cfg.orchestrator_bootstrap.storage_volume }}"
+        # the current keyfile that will unlock the luks encrypted block device
+        bootstrap_luks_keyfile: "{{ cfg.orchestrator_bootstrap.luks_keyfile }}"
+        # the current alias of the luks decrypted block device in /dev/mapper/
+        bootstrap_luks_device_name: "{{ cfg.orchestrator_bootstrap.luks_device_name }}"
+        bootstrap_luks_uuid: "{{ cfg.orchestrator_bootstrap.luks_uuid }}"
+        # bootstrap_network: "{{ cfg.networks[cfg.orchestrator_bootstrap.network] }}"
+
+    - name: Ensure installation target mounted
+      ansible.builtin.include_role: 
+        name: luks
+      # configuration vars 
+      vars:
+        storage: "{{ bootstrap_destination_volume }}"
+        luks_keyfile: "{{ cfg.orchestrator_bootstrap.luks_unlock_keyfile }}"
+          
+      
+
+
+
+
+

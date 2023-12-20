@@ -1,0 +1,39 @@
+---
+# roles/luks/tasks/info.yml
+
+- name: Print out provided parameters
+  ansible.builtin.debug:
+    msg: >
+      luks_name: {{ luks.name | default('---') }}
+
+      luks_path: {{ luks.path  | default('---') }}
+
+      luks_device_name: {{ luks.device_name  | default('---') }}
+
+      luks_uuid: {{ luks.uuid  | default('---') }}
+
+      luks_keyfile: {{ luks.keyfile  | default('---') }}
+
+      state: {{ state  | default('---') }}
+
+# Checking the status of the LUKS volume
+- name: Gather LUKS volume status information
+  ansible.builtin.command: cryptsetup status {{ luks.device_name }}
+  changed_when: false
+  register: luks_status
+  ignore_errors: true
+  become: true
+  when: luks.device_name is defined
+
+# Displaying the status of the LUKS volume
+- name: Display LUKS volume status
+  ansible.builtin.debug:
+    msg: >-
+      {{ luks_status.stdout }}
+  when: luks_status is defined and luks_status.rc == 0
+
+# Handling the case where the LUKS volume is not found or other errors
+- name: Display error message if LUKS volume status check fails
+  ansible.builtin.debug:
+    msg: "Failed to check LUKS volume status or volume does not exist."
+  when: luks_status is defined and luks_status.rc != 0

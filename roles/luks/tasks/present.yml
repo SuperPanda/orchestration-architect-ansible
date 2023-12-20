@@ -1,0 +1,34 @@
+---
+- name: Display parameters passed to luks/tasks/present.yml
+  ansible.builtin.debug:
+    msg: >-
+      luks_name: {{ luks.name }}
+      luks_path: {{ luks.path }}
+      luks_keyfile: {{ luks.keyfile }}
+      luks_device_name: {{ luks.device_name }}
+
+- name: >
+  Assert required parameters are supplied for
+  for the luks present state
+  ansible.builtin.assert:
+    that:
+      - luks is  defined
+      - luks.name is defined
+      - luks.path is defined
+      #- luks.keyfile is defined
+      #- luks.device_name is defined
+    fail_msg: >
+     LUKS role requires 'luks_name', 'luks_path',
+     'luks_device_name' and 'luks_keyfile' to
+      set luks to the 'present' state.
+    success_msg: >
+     All required parameters for the luks to be in
+     the 'present' state are present.
+
+- name: Ensure LUKS container is present '{{ luks.name }}'
+  community.crypto.luks_device:
+    device: "{{ luks.path }}"
+    state: present
+    keyfile: "{{ luks.keyfile }}"
+    name: "{{ luks.device_name }}"
+  become: true

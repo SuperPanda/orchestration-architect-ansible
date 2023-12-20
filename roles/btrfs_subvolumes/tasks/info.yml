@@ -1,0 +1,30 @@
+---
+# roles/btrfs_subvolumes/tasks/info.yml
+- name: Display parameters provided to BTRFS Subvolume role
+  ansible.builtin.debug:
+    msg: >-
+      btrfs_volume_path:
+        {{ btrfs_volume_path | default('---') }}
+
+        btrfs_subvolumes:
+          {{ btrfs_subvolumes }}
+
+- name: Gather BTRFS subvolume information
+  ansible.builtin.command: btrfs subvolume list {{ btrfs_volume_path }}
+  register: subvol_info
+  changed_when: false
+  ignore_errors: true
+  become: true
+
+- name: Display BTRFS subvolume information
+  ansible.builtin.debug:
+    msg: >
+      {{ subvol_info.stdout }}
+  when: subvol_info.rc == 0
+
+- name: Warn if unable to gather BTRFS subvolume information
+  ansible.builtin.debug:
+    msg: >-
+      Unable to gather BTRFS subvolume information
+      or none exist at the specified path.
+  when: subvol_info.rc != 0
