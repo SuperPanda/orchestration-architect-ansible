@@ -122,36 +122,6 @@ project_root/
 
 We welcome contributions from those interested in Ansible, system orchestration, and applied category theory. This project is not only a practical orchestration tool but also a learning platform for these emerging and intersecting fields.
 
-#### Run the Orchestration Bootstrap:
-
-```bash
-./00-bootstrap_orchestrator.sh
-```
-
-#### Further Configuration:
-
-Customize the roles and configurations in the vars directory based on your infrastructure requirements.
-
-## Contributing
-
-Contributions are welcome! Feel free to open issues, submit pull requests, or provide feedback.
-
-## Current Status
-
-As of the latest update, the project has achieved significant milestones:
-
-- **Bootstrap Role: Functional**, handling the initialization of the orchestrator.
-
-- **Encrypted Block Device Provisioning:** Deprecated, managing the lifecycle of encrypted block devices.
-
-- **KVM Provisioning:** Functional, allowing the definition and management of KVM-based virtual machines.
-
-- **Network Provisioning:** Functional, configuring OpenvSwitch bridges and ports based on the defined network topology.
-
-- **Archiso Provisioning:** Functional, generating custom bootable Linux images for deployment.
-
-- **LUKS Key Management:** Operational, managing LUKS encryption keys for secure storage.
-
 ## System Design Considerations
 
 ### Flexibility and Extensibility
