@@ -7,16 +7,16 @@
       luks_keyfile: {{ luks.keyfile }}
       luks_device_name: {{ luks.device_name }}
 
-- name: >
-  Assert required parameters are supplied for
-  for the luks present state
+- name: >-
+   Assert required parameters are supplied for for the luks present state
+
   ansible.builtin.assert:
     that:
       - luks is  defined
       - luks.name is defined
       - luks.path is defined
-      #- luks.keyfile is defined
-      #- luks.device_name is defined
+      - luks.keyfile is defined
+      - luks.device_name is defined
     fail_msg: >
      LUKS role requires 'luks_name', 'luks_path',
      'luks_device_name' and 'luks_keyfile' to
